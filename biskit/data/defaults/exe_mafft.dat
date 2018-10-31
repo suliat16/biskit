@@ -1,0 +1,27 @@
+[BINARY]
+
+comment=*Katoh, Misawa, Kuma and Miyata (Nucleic Acids Res. 30:3059-3066, 2002) MAFFT: a novel method for rapid multiple sequence alignment based on fast Fourier transform (describes the FFT-NS-1, FFT-NS-2 and FFT-NS-i strategies)
+
+## binary
+bin=mafft
+
+## working directory
+cwd=
+
+## wrap process in shell
+shell=0
+
+## use non-default shell
+shellexe=
+
+## communicate with process via STDIN and STDOUT
+pipes=0
+
+## Use new environment containing only variables given below
+replaceEnv=0
+
+##
+## run time environment settings
+## Empty entries mark variables that have to be specified from outside
+##
+[ENVIRONMENT]

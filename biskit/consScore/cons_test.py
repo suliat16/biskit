@@ -356,14 +356,14 @@ class TestCons(biskit.test.BiskitTest):
         """Tests that a bad request raises an exception in ortholog_to_fasta"""
         requests_mock.requests.get.status_code = 400
         with self.assertRaises(exceptions.RequestException):
-            self.aggregate.ortholog_to_fasta()
+            self.aggregate.ID_to_fasta()
 
     @patch('oma.requests.get')
     def test_ofasta_cdc(self, requests_mock):
         """Tests that ortholog_to_fasta correctly parses the response data"""
         requests_mock().status_code = 200
         requests_mock().text = self.fresponse
-        test = self.CDC48A.ortholog_to_fasta()
+        test = self.CDC48A.ID_to_fasta()
         self.assertTrue('[Arabis alpina]' in test)
 
     @patch('oma.requests.get')
@@ -448,18 +448,6 @@ class Test(biskit.test.BiskitTest):
         tester = self.CDC48A.call_orthologs()
         self.assertTrue(os.path.isfile(tester))
         self.assertTrue('Protein_Sequence.orth' in tester)
-
-    @patch('consLogo.oma.OrthologFinder.get_HOGs')
-    @patch('consLogo.oma.OrthologFinder.get_orthologs')
-    def test_call_orthologs_except(self, orth_mock, HOG_mock):
-        """Tests that call_orthologs properly calls oma.get_orthologs if get_HOGs fails"""
-        HOG_mock.side_effect = exceptions.RequestException('There was an issue querying the database. Status code 401')
-        orth_mock.return_value = self.ex_seq
-        test = self.CDC48A.call_orthologs()
-        self.assertTrue(os.path.isfile(test))
-        self.assertTrue(HOG_mock.called)
-        self.assertTrue(orth_mock.called)
-        self.assertTrue('Protein_Sequence.orth' in test)
 
     @patch('seq2conservation.aminoCons.build_alignment')
     def test_call_alignment(self, mock_aln):

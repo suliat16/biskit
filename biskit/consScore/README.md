@@ -44,13 +44,8 @@ Dependencies:
  
 Requests and Biskit are python modules, Mafft and Rate4Site are external programs. All external programs must be on the PATH (UNIX) in order to execute. 
 
-To install consScore:
-
-```UNIX
-$ git clone https://github.com/suliat16/consScore/
-$ cd consScore
-$ python setup.py install
-```
+ConsScore is available as a module in biskit, available at this link:
+https://github.com/graik/biskit
 Its recommended to run the test files to ensure that everything is installed and running properly. 
 
 ## Citations

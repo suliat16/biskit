@@ -34,6 +34,8 @@ import biskit.tools as T
 from biskit.exe.dssp import Dssp
 from biskit.exe.surfaceRacer import SurfaceRacer
 from biskit.exe.delphi import Delphi, DelphiError
+from biskit.consScore.seq2conservation import ConservationPipe
+from biskit.exe.pymoler import Pymoler
 
 
 class PDBDope:
@@ -111,13 +113,41 @@ class PDBDope:
                             comment='PSI angle from DSSP',
                             default=360.0)
                             
+    def add_conscore(self, verbose=0, log=None, cache=True, identity=True, score=True, qqint=False, std=False,
+                gapped=False):
+        """"""
+        ## Because self.m.residues returns an empty ProfileCollection, cannot run through pipeline. How to get
+        ## sequence data? Into a profile collection?
+        #Add hogs parameter once seq2conservation is updated
+        mask = self.m.maskProtein()
+        res_mask = self.m.atom2resMask(mask)
+
+        if not N0.alltrue(mask):
+            self.m = self.m.compress(mask)
+
+        cons = ConservationPipe(self.m.sequence(), name=self.m.pdbCode, cache=cache, profile=True,
+                                identity=identity, score=score, qqint=qqint, std=std)
+        cons_profile = cons.pipe()
+
+        self.m.residues.setMany(cons_profile)
+
+    def generate_cons_image(self, fasta):
+        """"""
+        #TODO: Replace fasta with the residues given in the masked model
+        cons = ConservationPipe(fasta, name=self.m.fileName, identity=False)
+        cons_profile = cons.pipe()
+
+        pm = Pymoler()
+        pm.addPdb(self.m, '{0}'.format(self.m.fileName))
+        pm.colorRes('{0}'.format(self.m.fileName), cons_profile["Conservation Score"])
+        return pm.show()
 
 
     def addConservation( self, pfamEntries=None, verbose=0, log=None):
         """
         Adds a conservation score profile from pFam HMMs. See L{Biskit.Hmmer}
         The theoretically most useful one is 'cons_ent' which gives the relative
-        entropy of the residue distribution with respect to the background 
+        entropy of the residue distribution with imoespect to the background
         distribution of amino acids (Kullback-Leibler distance) in swissprot.
         See PMID 16916457.
 
@@ -367,7 +397,7 @@ class Test(BT.BiskitTest):
 
     def prepare(self):
         from biskit import PDBModel
-        self.f = T.testRoot() + '/com/1BGS.pdb'
+        self.f = T.testRoot() + 'com/1BGS.pdb'
 
         if not Test.M:
             if self.local: print("Loading PDB...", end=' ')
@@ -458,6 +488,20 @@ class LongTest( BT.BiskitTest ):
         self.M = self.M.compress( self.M.maskProtein() )
 
         self.d = PDBDope( self.M )
+
+
+    def test_add_conscore(self):
+        """Tests that the conservation score is added to a PDBModel"""
+        if self.local:
+            print("Adding conservation data...", end= ' ')
+        self.d.add_conscore()
+        if self.local:
+            print('Done')
+
+        self.assertEqual()
+
+
+
 
     ## test de-activated as we don't have a running Hmmer module any longer
     def __test_conservation(self):

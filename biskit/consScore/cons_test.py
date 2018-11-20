@@ -471,6 +471,7 @@ class Test(biskit.test.BiskitTest):
     @patch('seq2conservation.aminoCons.build_alignment')
     @patch('seq2conservation.aminoCons.Rate4Site.run')
     def test_pipe(self, mock_run, mock_aln, mock_hog):
+
         """tests that the pipe calls the correct methods and generates the correct output"""
         mock_hog.return_value = self.ex_seq
         mock_aln.return_value = os.getcwd()+os.sep+'example_data'+os.sep + 'multiFasta.aln'

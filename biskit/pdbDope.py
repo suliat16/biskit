@@ -116,9 +116,8 @@ class PDBDope:
     def add_conscore(self, verbose=0, log=None, cache=True, identity=True, score=True, qqint=False, std=False,
                 gapped=False):
         """"""
-        ## Because self.m.residues returns an empty ProfileCollection, cannot run through pipeline. How to get
-        ## sequence data? Into a profile collection?
         #Add hogs parameter once seq2conservation is updated
+
         mask = self.m.maskProtein()
         res_mask = self.m.atom2resMask(mask)
 
@@ -134,12 +133,15 @@ class PDBDope:
     def generate_cons_image(self, fasta):
         """"""
         #TODO: Replace fasta with the residues given in the masked model
-        cons = ConservationPipe(fasta, name=self.m.fileName, identity=False)
+        ##Colour is not properly added because the indexing is returning the following
+        ##IndexError: ('index 147 is out of bounds for axis 0 with size 147',
+        ## Does not actually add the colours
+        cons = ConservationPipe(fasta, name=self.m.pdbCode, identity=False)
         cons_profile = cons.pipe()
 
         pm = Pymoler()
         pm.addPdb(self.m, '{0}'.format(self.m.fileName))
-        pm.colorRes('{0}'.format(self.m.fileName), cons_profile["Conservation Score"])
+        pm.colorAtoms('{0}'.format(self.m.fileName), cons_profile["Conservation Score"])
         return pm.show()
 
 
